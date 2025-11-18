@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление студентами</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333; min-height: 100vh; padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header {
+            background: white; padding: 30px; border-radius: 15px;
+            margin-bottom: 30px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 { color: #4a5568; margin-bottom: 10px; }
+        .content { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; }
+        @media (max-width: 768px) { .content { grid-template-columns: 1fr; } }
+        .form-section, .students-section {
+            background: white; padding: 30px; border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #4a5568; }
+        input, select {
+            width: 100%; padding: 12px; border: 2px solid #e2e8f0;
+            border-radius: 8px; font-size: 16px;
+        }
+        input:focus, select:focus { outline: none; border-color: #667eea; }
+        .btn {
+            background: #667eea; color: white; padding: 12px 30px;
+            border: none; border-radius: 8px; cursor: pointer; width: 100%;
+            transition: all 0.3s ease;
+        }
+        .btn:hover { background: #5a67d8; transform: translateY(-2px); }
+        .btn:disabled { background: #a0aec0; cursor: not-allowed; transform: none; }
+        .student-card {
+            background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 10px;
+            padding: 20px; margin-bottom: 15px;
+        }
+        .student-name { font-size: 1.3em; color: #4a5568; margin-bottom: 5px; }
+        .student-info { color: #718096; margin-bottom: 5px; }
+        .loading { text-align: center; padding: 20px; color: #718096; }
+        .error { background: #fed7d7; color: #c53030; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .success { background: #c6f6d5; color: #276749; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👥 Управление студентами</h1>
+            <p>Добавление и просмотр студентов системы</p>
+            <div style="margin-top: 20px;">
+                <a href="/" style="background: #667eea; color: white; padding: 10px 20px; border-radius: 25px; text-decoration: none;">🏠 Главная</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Форма добавления студента -->
+            <div class="form-section">
+                <h2>➕ Добавить студента</h2>
+                <div id="formMessage"></div>
+                <form id="studentForm">
+                    <div class="form-group">
+                        <label for="id">ID студента *</label>
+                        <input type="number" id="id" required min="1" placeholder="Уникальный ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="first_name">Имя *</label>
+                        <input type="text" id="first_name" required placeholder="Введите имя">
+                    </div>
+                    <div class="form-group">
+                        <label for="last_name">Фамилия *</label>
+                        <input type="text" id="last_name" required placeholder="Введите фамилию">
+                    </div>
+                    <div class="form-group">
+                        <label for="age">Возраст *</label>
+                        <input type="number" id="age" required min="16" max="100" placeholder="От 16 до 100">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" placeholder="email@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="is_active">Статус *</label>
+                        <select id="is_active" required>
+                            <option value="true">✅ Активный</option>
+                            <option value="false">❌ Неактивный</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn" id="submitBtn">➕ Добавить студента</button>
+                </form>
+            </div>
+
+            <!-- Список студентов -->
+            <div class="students-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>📋 Список студентов</h2>
+                    <button class="btn" onclick="loadStudents()" style="width: auto;">🔄 Обновить</button>
+                </div>
+                <div id="studentsMessage"></div>
+                <div id="studentsList">
+                    <div class="loading">Загрузка студентов...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Загружаем студентов при загрузке страницы
+        document.addEventListener('DOMContentLoaded', loadStudents);
+
+        // Функция загрузки студентов
+        async function loadStudents() {
+            try {
+                document.getElementById('studentsList').innerHTML = '<div class="loading">Загрузка студентов...</div>';
+
+                const response = await fetch('/api/students/');
+                if (!response.ok) throw new Error('Ошибка загрузки');
+
+                const data = await response.json();
+                displayStudents(data.students);
+
+            } catch (error) {
+                document.getElementById('studentsList').innerHTML = '<div class="error">❌ Ошибка: ' + error.message + '</div>';
+            }
+        }
+
+        // Функция отображения студентов
+        function displayStudents(students) {
+            const studentsList = document.getElementById('studentsList');
+
+            if (students.length === 0) {
+                studentsList.innerHTML = '<div class="loading">Нет студентов</div>';
+                return;
+            }
+
+            studentsList.innerHTML = students.map(student => `
+                <div class="student-card">
+                    <div class="student-name">${student.first_name} ${student.last_name}</div>
+                    <div class="student-info">🎂 Возраст: ${student.age} лет</div>
+                    <div class="student-info">🎓 ID: ${student.id}</div>
+                    ${student.email ? `<div class="student-info">📧 ${student.email}</div>` : ''}
+                    <div class="student-info">Статус: ${student.is_active ? '✅ Активный' : '❌ Неактивный'}</div>
+                </div>
+            `).join('');
+        }
+
+        // Обработка формы добавления студента
+        document.getElementById('studentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+
+            try {
+                submitBtn.disabled = true;
+                submitBtn.textContent = '⏳ Добавление...';
+
+                // Собираем данные ПРАВИЛЬНО
+                const studentData = {
+                    id: parseInt(document.getElementById('id').value),
+                    first_name: document.getElementById('first_name').value,
+                    last_name: document.getElementById('last_name').value,
+                    age: parseInt(document.getElementById('age').value),
+                    email: document.getElementById('email').value || null,
+                    is_active: document.getElementById('is_active').value === 'true'
+                };
+
+                console.log('Отправляемые данные:', studentData);
+
+                // Отправляем запрос
+                const response = await fetch('/api/students/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(studentData)
+                });
+
+                console.log('Статус ответа:', response.status);
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Ошибка сервера');
+                }
+
+                const result = await response.json();
+                showFormMessage('✅ ' + result.message, 'success');
+                this.reset();
+                loadStudents();
+
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showFormMessage('❌ ' + error.message, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '➕ Добавить студента';
+            }
+        });
+
+        // Функция показа сообщений
+        function showFormMessage(message, type) {
+            const messageDiv = document.getElementById('formMessage');
+            messageDiv.innerHTML = `<div class="${type}">${message}</div>`;
+            setTimeout(() => messageDiv.innerHTML = '', 5000);
+        }
+    </script>
+</body>
+</html>
