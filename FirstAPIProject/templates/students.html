@@ -65,10 +65,6 @@
                 <div id="formMessage"></div>
                 <form id="studentForm">
                     <div class="form-group">
-                        <label for="id">ID студента *</label>
-                        <input type="number" id="id" required min="1" placeholder="Уникальный ID">
-                    </div>
-                    <div class="form-group">
                         <label for="first_name">Имя *</label>
                         <input type="text" id="first_name" required placeholder="Введите имя">
                     </div>
@@ -122,9 +118,24 @@
                 if (!response.ok) throw new Error('Ошибка загрузки');
 
                 const data = await response.json();
-                displayStudents(data.students);
+
+                console.log('📊 Данные от API:', data);
+
+                // 🔧 ИСПРАВЛЕНИЕ: Проверяем разные форматы ответа
+                let students = [];
+                if (data.students) {
+                    students = data.students; // Формат: { "students": [...] }
+                } else if (Array.isArray(data)) {
+                    students = data; // Формат: [...]
+                } else {
+                    throw new Error('Неизвестный формат ответа от сервера');
+                }
+
+                console.log('Получены студенты:', students);
+                displayStudents(students);
 
             } catch (error) {
+                console.error('Ошибка загрузки:', error);
                 document.getElementById('studentsList').innerHTML = '<div class="error">❌ Ошибка: ' + error.message + '</div>';
             }
         }
@@ -133,7 +144,7 @@
         function displayStudents(students) {
             const studentsList = document.getElementById('studentsList');
 
-            if (students.length === 0) {
+            if (!students || students.length === 0) {
                 studentsList.innerHTML = '<div class="loading">Нет студентов</div>';
                 return;
             }
@@ -159,9 +170,8 @@
                 submitBtn.disabled = true;
                 submitBtn.textContent = '⏳ Добавление...';
 
-                // Собираем данные ПРАВИЛЬНО
+                // Собираем данные
                 const studentData = {
-                    id: parseInt(document.getElementById('id').value),
                     first_name: document.getElementById('first_name').value,
                     last_name: document.getElementById('last_name').value,
                     age: parseInt(document.getElementById('age').value),
@@ -188,9 +198,11 @@
                 }
 
                 const result = await response.json();
+                console.log('Успешный ответ:', result);
+
                 showFormMessage('✅ ' + result.message, 'success');
                 this.reset();
-                loadStudents();
+                loadStudents(); // Обновляем список
 
             } catch (error) {
                 console.error('Ошибка:', error);
