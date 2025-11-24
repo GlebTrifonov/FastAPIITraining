@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  fastapi-app:
+    build: .
+    ports:
+      - "8000:8000"
+    container_name: fastapi-courses-app
+    restart: unless-stopped
+
+    # Окруджение
+    environment:
+      - DATABASE_URL=sqlite:///./data/student_management.db
+      - PYTHONPATH=/app
+
+    # Volumes
+    volumes:
+      - ./data:/app/data
