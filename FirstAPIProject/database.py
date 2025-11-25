@@ -6,6 +6,9 @@ import databases
 
 DATABASE_URL = "sqlite:///./student_management.db"
 
+# TODO: Неиспользуемый import - databases нигде не применяется
+# Либо уберите, либо переп ишите CRUD на async
+# См. REVIEW.md секция "Критические проблемы" пункт 6
 database = databases.Database(DATABASE_URL) #асинхронное подкл к БД
 metadata = MetaData() #Инфо о структуре таблиц
 Base = declarative_base()
@@ -49,6 +52,10 @@ enrollments = Table(
 
     Column("id", Integer, primary_key=True),
 
+    # TODO: КРИТИЧНО! Неправильный Foreign Key - student_id должен ссылаться на students.id, а не courses.id
+    # Сейчас: ForeignKey("courses.id") ❌
+    # Должно быть: ForeignKey("students.id") ✅
+    # См. REVIEW.md секция "Критические проблемы" пункт 1
     Column("student_id", Integer, ForeignKey("courses.id"), nullable=False),
 
     Column("course_id", Integer, ForeignKey("courses.id"), nullable=False),
@@ -56,6 +63,9 @@ enrollments = Table(
 
 
 engine = create_engine(DATABASE_URL)
+# TODO: Удалите metadata.create_all() и используйте Alembic миграции
+# При изменении схемы БД все данные ТЕРЯЮТСЯ!
+# См. REVIEW.md секция "Критические проблемы" пункт 3
 metadata.create_all(engine)
 
 

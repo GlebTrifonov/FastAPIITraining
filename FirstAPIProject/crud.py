@@ -10,6 +10,9 @@ def get_connection():
     return engine.connect()
 
 #CRUD for students
+# TODO: Добавьте обработку ошибок БД с try/except IntegrityError
+# При дублировании email или constraint violation приложение упадет
+# См. REVIEW.md секция "Критические проблемы" пункт 5
 def create_student(student: StudentCreate) -> Student:
     with get_connection() as conn:
         query = insert(students).values(
@@ -20,7 +23,7 @@ def create_student(student: StudentCreate) -> Student:
             is_active=student.is_active
         )
 
-        result = conn.execute(query)
+        result = conn.execute(query)  # TODO: обернуть в try/except
         conn.commit()
 
         new_id = result.inserted_primary_key[0]
@@ -230,4 +233,6 @@ def delete_enrollment(enrollment_id: int) -> bool:
         return result.rowcount > 0
 
 
+# TODO: Замените print() на logger.info()
+# См. REVIEW.md секция "Критические проблемы" пункт 7
 print("CRUD is created")

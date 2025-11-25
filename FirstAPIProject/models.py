@@ -1,16 +1,19 @@
 from pydantic import BaseModel, ConfigDict
 from typing import Optional, List
 
+# TODO: Добавьте валидацию с Field (min_length, max_length, ge, le)
+# Нет проверок на длину строк, диапазон возраста, формат email
+# См. REVIEW.md секция "Критические проблемы" пункт 4
 class Student(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
 
     id: int
-    first_name: str
-    last_name: str
-    age: int
-    email: Optional[str] = None
+    first_name: str  # TODO: Field(min_length=2, max_length=50)
+    last_name: str  # TODO: Field(min_length=2, max_length=50)
+    age: int  # TODO: Field(ge=16, le=100)
+    email: Optional[str] = None  # TODO: EmailStr для валидации формата
     is_active: bool = True
 
 class Course(BaseModel):
