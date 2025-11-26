@@ -1,15 +1,17 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import HTMLResponse
+from sqlalchemy.orm import Session
 import crud
 from models import Enrollment, EnrollmentCreate
+from database import get_db
 
 router = APIRouter(prefix="/api", tags=["enrollments"])
 
 @router.post("/enroll/", response_model=Enrollment)
-async def enroll_student(enrollment: EnrollmentCreate):
+async def enroll_student(enrollment: EnrollmentCreate, db: Session = Depends(get_db)):
     """Записать студента на курс"""
     try:
-        new_enrollment = crud.create_enrollment(enrollment)
+        new_enrollment = crud.create_enrollment(db, enrollment)
         return new_enrollment
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -17,21 +19,30 @@ async def enroll_student(enrollment: EnrollmentCreate):
         raise HTTPException(status_code=500, detail=f"Ошибка сервера: {str(e)}")
 
 @router.get("/enrollments/", response_model=list[Enrollment])
-async def get_enrollments():
+async def get_enrollments(db: Session = Depends(get_db)):
     """Получить все записи на курсы"""
-    enrollments = crud.get_all_enrollments()
+    enrollments = crud.get_all_enrollments(db)
     return enrollments
 
 @router.get("/enrollments/detailed/")
-async def get_detailed_enrollments():
+async def get_detailed_enrollments(db: Session = Depends(get_db)):
     """Получить записи с информацией о студентах и курсах"""
-    detailed_enrollments = crud.get_detailed_enrollments()
+    detailed_enrollments = crud.get_detailed_enrollments(db)
     return {"enrollments": detailed_enrollments}
 
+@router.put("/enrollments/{enrollment_id}/", response_model=Enrollment)
+async def update_enrollment(
+        enrollment_id: int,
+        enrollment: EnrollmentCreate,
+        db: Session = Depends(get_db),
+):
+    updated_enrollment = crud.update_enrollment(db, enrollment_id, enrollment)
+    return updated_enrollment
+
 @router.delete("/enrollments/{enrollment_id}")
-async def delete_enrollment(enrollment_id: int):
+async def delete_enrollment(enrollment_id: int, db: Session = Depends(get_db)):
     """Удалить запись по ID"""
-    success = crud.delete_enrollment(enrollment_id)
+    success = crud.delete_enrollment(db, enrollment_id)
     if not success:
         raise HTTPException(status_code=404, detail="Enrollment not found")
     return {"message": "Enrollment deleted successfully"}

@@ -7,6 +7,9 @@ import uvicorn
 from routers.students import router as students_router
 from routers.courses import router as courses_router
 from routers.enrollments import router as enrollments_router
+from database import create_tables
+
+create_tables()
 
 # 1. СОЗДАНИЕ ПРИЛОЖЕНИЯ
 app = FastAPI(
