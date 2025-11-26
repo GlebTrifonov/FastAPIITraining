@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система управления студентами</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #4a5568;
+            margin-bottom: 15px;
+            font-size: 3em;
+        }
+
+        .subtitle {
+            color: #718096;
+            font-size: 1.3em;
+            margin-bottom: 30px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1em;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .links {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .link-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .link-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            background: #f7fafc;
+        }
+
+        .link-card h3 {
+            margin-bottom: 15px;
+            color: #4a5568;
+            font-size: 1.4em;
+        }
+
+        .link-card p {
+            color: #718096;
+            line-height: 1.6;
+            font-size: 1em;
+        }
+
+        .api-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .api-link {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .api-link:hover {
+            background: #5a67d8;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 20px;
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .nav-link:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        /* Адаптивность для мобильных */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 2.2em;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .links {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .stat-card {
+                padding: 25px;
+            }
+
+            .link-card {
+                padding: 25px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .subtitle {
+                font-size: 1.1em;
+            }
+
+            .stat-number {
+                font-size: 2.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Student Management System</h1>
+            <p class="subtitle">Комплексная система управления студентами, курсами и учебными записями</p>
+
+            <div class="nav-links">
+                <a href="/students/" class="nav-link">👥 Студенты</a>
+                <a href="/courses/" class="nav-link">📚 Курсы</a>
+                <a href="/enrollments/" class="nav-link">📋 Записи</a>
+                <a href="/docs" class="nav-link">🔧 API</a>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="students-count">0</div>
+                <div class="stat-label">Студентов в системе</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="courses-count">0</div>
+                <div class="stat-label">Доступных курсов</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="enrollments-count">0</div>
+                <div class="stat-label">Активных записей</div>
+            </div>
+        </div>
+
+        <div class="links">
+            <a href="/students/" class="link-card">
+                <h3>👥 Управление студентами</h3>
+                <p>Полный контроль над базой студентов: добавление новых, редактирование информации, просмотр деталей и управление статусами.</p>
+            </a>
+            <a href="/courses/" class="link-card">
+                <h3>📖 Каталог курсов</h3>
+                <p>Создание и управление учебными программами, настройка продолжительности, стоимости и описания курсов.</p>
+            </a>
+            <a href="/enrollments/" class="link-card">
+                <h3>📋 Записи на курсы</h3>
+                <p>Система записи студентов на курсы, просмотр текущих записей и управление учебными назначениями.</p>
+            </a>
+            <a href="/docs" class="link-card">
+                <h3>🔧 API Документация</h3>
+                <p>Полное REST API для интеграции с другими системами. Документация с примерами запросов и ответов.</p>
+            </a>
+        </div>
+
+        <div class="api-section">
+            <h3 style="color: #4a5568; margin-bottom: 20px;">🚀 Для разработчиков</h3>
+            <p style="color: #718096; margin-bottom: 20px; max-width: 600px; margin-left: auto; margin-right: auto;">
+                Наша система предоставляет полноценное REST API для интеграции с вашими приложениями.
+                Все эндпоинты документированы и готовы к использованию.
+            </p>
+            <a href="/docs" class="api-link">📚 Открыть документацию API</a>
+        </div>
+
+        <div class="footer">
+            Student Management System • Версия 2.0.0 • Powered by FastAPI & SQLite
+        </div>
+    </div>
+
+    <script>
+        // Загружаем статистику при загрузке страницы
+        async function loadStats() {
+            try {
+                console.log('🔄 Загрузка статистики системы...');
+
+                const [studentsRes, coursesRes, enrollmentsRes] = await Promise.all([
+                    fetch('/api/students/').catch(() => ({ok: false})),
+                    fetch('/api/courses/').catch(() => ({ok: false})),
+                    fetch('/api/enrollments/').catch(() => ({ok: false}))
+                ]);
+
+                let studentsCount = 0;
+                let coursesCount = 0;
+                let enrollmentsCount = 0;
+
+                if (studentsRes.ok) {
+                    const data = await studentsRes.json();
+                    // 🔧 Проверяем разные форматы ответа
+                    studentsCount = data.students ? data.students.length : (Array.isArray(data) ? data.length : 0);
+                    document.getElementById('students-count').textContent = studentsCount;
+                    console.log('✅ Студенты:', studentsCount);
+                }
+
+                if (coursesRes.ok) {
+                    const data = await coursesRes.json();
+                    coursesCount = data.courses ? data.courses.length : (Array.isArray(data) ? data.length : 0);
+                    document.getElementById('courses-count').textContent = coursesCount;
+                    console.log('✅ Курсы:', coursesCount);
+                }
+
+                if (enrollmentsRes.ok) {
+                    const data = await enrollmentsRes.json();
+                    enrollmentsCount = data.enrollments ? data.enrollments.length : (Array.isArray(data) ? data.length : 0);
+                    document.getElementById('enrollments-count').textContent = enrollmentsCount;
+                    console.log('✅ Записи:', enrollmentsCount);
+                }
+
+                console.log(`📊 Статистика загружена: ${studentsCount} студентов, ${coursesCount} курсов, ${enrollmentsCount} записей`);
+
+            } catch (error) {
+                console.log('⚠️ Статистика загружена в базовом режиме');
+                // Устанавливаем значения по умолчанию
+                document.getElementById('students-count').textContent = '0';
+                document.getElementById('courses-count').textContent = '0';
+                document.getElementById('enrollments-count').textContent = '0';
+            }
+        }
+
+        // Загружаем статистику когда страница загрузилась
+        document.addEventListener('DOMContentLoaded', loadStats);
+
+        // Обновляем статистику каждые 30 секунд
+        setInterval(loadStats, 30000);
+    </script>
+</body>
+</html>

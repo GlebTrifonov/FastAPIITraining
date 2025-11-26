@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Записи на курсы</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            color: #718096;
+            font-size: 1.2em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-title {
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #4a5568;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            width: auto;
+            font-size: 14px;
+        }
+
+        .enrollments-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .enrollments-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .enrollments-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .enrollment-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .enrollment-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .enrollment-id {
+            font-size: 1.1em;
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .enrollment-info {
+            color: #718096;
+            margin-bottom: 5px;
+        }
+
+        .student-info {
+            color: #4299e1;
+            font-weight: 500;
+        }
+
+        .course-info {
+            color: #48bb78;
+            font-weight: 500;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #718096;
+        }
+
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #e53e3e;
+        }
+
+        .success {
+            background: #c6f6d5;
+            color: #276749;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #38a169;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+
+        .empty-state-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #718096;
+        }
+
+        .btn-danger {
+            background: #e53e3e;
+        }
+
+        .btn-danger:hover {
+            background: #c53030;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔗 Записи на курсы</h1>
+            <p class="subtitle">Управление записями студентов на учебные курсы</p>
+            <div class="nav-links">
+                <a href="/" class="nav-link">🏠 Главная</a>
+                <a href="/students/" class="nav-link">👥 Студенты</a>
+                <a href="/courses/" class="nav-link">📚 Курсы</a>
+                <a href="/docs" class="nav-link">📖 API Документация</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Форма добавления записи -->
+            <div class="form-section">
+                <h2 class="form-title">➕ Новая запись</h2>
+
+                <div id="formMessage"></div>
+
+                <form id="enroll-form">
+                    <div class="form-group">
+                        <label for="student-id">ID студента *</label>
+                        <input type="number" id="student-id" required min="1" placeholder="Введите ID студента">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="course-id">ID курса *</label>
+                        <input type="number" id="course-id" required min="1" placeholder="Введите ID курса">
+                    </div>
+
+                    <button type="submit" class="btn" id="submitBtn">
+                        📝 Записать на курс
+                    </button>
+                </form>
+
+                <div style="margin-top: 20px; padding: 15px; background: #edf2f7; border-radius: 8px;">
+                    <strong>💡 Подсказка:</strong> ID записи генерируется автоматически
+                </div>
+            </div>
+
+            <!-- Список записей -->
+            <div class="enrollments-section">
+                <div class="enrollments-header">
+                    <h2 class="form-title">📋 Активные записи (<span id="enrollmentsCount">0</span>)</h2>
+                    <button class="btn btn-small" onclick="loadEnrollments()" id="refreshBtn">
+                        🔄 Обновить
+                    </button>
+                </div>
+
+                <div id="enrollmentsMessage"></div>
+
+                <div class="enrollments-list" id="enrollmentsList">
+                    <div class="loading">⏳ Загрузка записей...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Загружаем записи при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Страница записей загружена');
+            loadEnrollments();
+        });
+
+        // Функция загрузки записей
+        async function loadEnrollments() {
+            try {
+                const refreshBtn = document.getElementById('refreshBtn');
+                refreshBtn.disabled = true;
+                refreshBtn.textContent = '⏳ Загрузка...';
+
+                document.getElementById('enrollmentsList').innerHTML = '<div class="loading">⏳ Загрузка записей...</div>';
+                showEnrollmentsMessage('', '');
+
+                const response = await fetch('/api/enrollments/detailed/');
+                console.log('Ответ сервера:', response.status);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Данные получены:', data);
+
+                // 🔧 ИСПРАВЛЕНИЕ: Проверяем разные форматы ответа
+                let enrollments = [];
+                if (data.enrollments) {
+                    enrollments = data.enrollments; // Формат: { "enrollments": [...] }
+                } else if (Array.isArray(data)) {
+                    enrollments = data; // Формат: [...]
+                } else {
+                    throw new Error('Неизвестный формат ответа от сервера');
+                }
+
+                displayEnrollments(enrollments);
+                showEnrollmentsMessage(`✅ Загружено ${enrollments.length} записей`, 'success');
+
+            } catch (error) {
+                console.error('Ошибка загрузки записей:', error);
+                document.getElementById('enrollmentsList').innerHTML =
+                    '<div class="error">❌ Ошибка загрузки записей: ' + error.message + '</div>';
+                showEnrollmentsMessage('❌ Не удалось загрузить записи', 'error');
+            } finally {
+                const refreshBtn = document.getElementById('refreshBtn');
+                refreshBtn.disabled = false;
+                refreshBtn.textContent = '🔄 Обновить';
+            }
+        }
+
+        // Функция отображения записей
+        function displayEnrollments(enrollments) {
+            const enrollmentsList = document.getElementById('enrollmentsList');
+            const enrollmentsCount = document.getElementById('enrollmentsCount');
+
+            enrollmentsCount.textContent = enrollments.length;
+
+            if (!enrollments || enrollments.length === 0) {
+                enrollmentsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <div>Записей пока нет</div>
+                        <div style="margin-top: 10px; font-size: 0.9em; color: #718096;">
+                            Создайте первую запись используя форму слева
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            enrollmentsList.innerHTML = enrollments.map(enrollment => {
+                // 🔧 ИСПРАВЛЕНИЕ: Проверяем структуру данных
+                const enrollmentData = enrollment.enrollment || enrollment;
+                const student = enrollment.student || {};
+                const course = enrollment.course || {};
+
+                return `
+                <div class="enrollment-card">
+                    <div class="enrollment-id">Запись #${enrollmentData.id || 'N/A'}</div>
+
+                    <div class="enrollment-info student-info">
+                        👨‍🎓 Студент: ${student.first_name || 'Неизвестно'} ${student.last_name || ''} (ID: ${enrollmentData.student_id})
+                    </div>
+
+                    <div class="enrollment-info course-info">
+                        📖 Курс: ${course.title || 'Неизвестно'} (ID: ${enrollmentData.course_id})
+                    </div>
+
+                    ${course.duration_hours ? `
+                        <div class="enrollment-info">
+                            ⏱️ Длительность: ${course.duration_hours} часов
+                        </div>
+                    ` : ''}
+
+                    <div style="margin-top: 10px;">
+                        <button class="btn btn-small btn-danger" onclick="deleteEnrollment(${enrollmentData.id})">
+                            🗑️ Удалить запись
+                        </button>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        // Обработка формы добавления записи
+        document.getElementById('enroll-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.textContent;
+
+            try {
+                submitBtn.disabled = true;
+                submitBtn.textContent = '⏳ Создание...';
+
+                // 🔧 ИСПРАВЛЕНИЕ: Убрал поле id - генерируется автоматически
+                const enrollmentData = {
+                    student_id: parseInt(document.getElementById('student-id').value),
+                    course_id: parseInt(document.getElementById('course-id').value)
+                };
+
+                console.log('Отправляемые данные:', enrollmentData);
+
+                // Валидация
+                if (!enrollmentData.student_id || !enrollmentData.course_id) {
+                    throw new Error('ID студента и курса обязательны');
+                }
+
+                // Отправляем запрос
+                const response = await fetch('/api/enroll/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(enrollmentData)
+                });
+
+                console.log('Статус ответа:', response.status);
+
+                if (!response.ok) {
+                    let errorDetail = 'Неизвестная ошибка';
+                    try {
+                        const errorData = await response.json();
+                        errorDetail = errorData.detail || JSON.stringify(errorData);
+                    } catch (parseError) {
+                        errorDetail = await response.text();
+                    }
+                    throw new Error(errorDetail);
+                }
+
+                const result = await response.json();
+                console.log('Успешный ответ:', result);
+
+                showFormMessage('✅ ' + result.message, 'success');
+                this.reset();
+
+                // Обновляем список через секунду
+                setTimeout(loadEnrollments, 1000);
+
+            } catch (error) {
+                console.error('Ошибка при создании записи:', error);
+                showFormMessage('❌ Ошибка: ' + error.message, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        });
+
+        // 🔧 ИСПРАВЛЕНИЕ: Реализуем удаление записи
+        async function deleteEnrollment(enrollmentId) {
+            if (!confirm(`Вы уверены, что хотите удалить запись с ID ${enrollmentId}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/enrollments/${enrollmentId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showEnrollmentsMessage('✅ Запись успешно удалена', 'success');
+                    loadEnrollments(); // Обновляем список
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Ошибка удаления');
+                }
+            } catch (error) {
+                showEnrollmentsMessage('❌ Ошибка удаления: ' + error.message, 'error');
+            }
+        }
+
+        // Функция показа сообщений в форме
+        function showFormMessage(message, type) {
+            const messageDiv = document.getElementById('formMessage');
+            if (message) {
+                messageDiv.innerHTML = `<div class="${type}">${message}</div>`;
+                setTimeout(() => {
+                    messageDiv.innerHTML = '';
+                }, 5000);
+            } else {
+                messageDiv.innerHTML = '';
+            }
+        }
+
+        // Функция показа сообщений в списке записей
+        function showEnrollmentsMessage(message, type) {
+            const messageDiv = document.getElementById('enrollmentsMessage');
+            if (message) {
+                messageDiv.innerHTML = `<div class="${type}">${message}</div>`;
+                setTimeout(() => {
+                    messageDiv.innerHTML = '';
+                }, 5000);
+            } else {
+                messageDiv.innerHTML = '';
+            }
+        }
+    </script>
+</body>
+</html>
