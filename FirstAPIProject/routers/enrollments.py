@@ -36,9 +36,9 @@ async def get_detailed_enrollments(db: Session = Depends(get_db)):
 
 @router.put("/enrollments/{enrollment_id}/", response_model=Enrollment)
 async def update_enrollment(
-    enrollment_id: int,
-    enrollment: EnrollmentCreate,
-    db: Session = Depends(get_db),
+        enrollment_id: int,
+        enrollment: EnrollmentCreate,
+        db: Session = Depends(get_db),
 ):
     updated_enrollment = crud.update_enrollment(db, enrollment_id, enrollment)
     return updated_enrollment

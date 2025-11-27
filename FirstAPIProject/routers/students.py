@@ -24,7 +24,7 @@ async def get_student(student_id: int, db: Session = Depends(get_db)):
 
 @router.post("/", response_model=Student)
 async def create_student(student: StudentCreate, db: Session = Depends(get_db)):
-    new_student = crud.create_student(db, student)
+    new_student = crud.create_student(db,student)
     return new_student
 
 

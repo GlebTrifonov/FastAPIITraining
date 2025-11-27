@@ -35,7 +35,7 @@ def run_migrations_offline():
         url=url,
         target_metadata=target_metadata,
         literal_binds=True,
-        dialect_name={"paramstyle": "named"},
+        dialect_name ={"paramstyle": "named"},
     )
 
     with context.begin_transaction():

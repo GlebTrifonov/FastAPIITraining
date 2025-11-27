@@ -24,6 +24,7 @@ app.include_router(courses_router)
 app.include_router(enrollments_router)
 
 
+
 # 3. HTML СТРАНИЦЫ
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
