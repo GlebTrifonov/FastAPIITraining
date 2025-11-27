@@ -34,19 +34,25 @@ async def read_root():
     except FileNotFoundError:
         return HTMLResponse(content="<h1>HTML file not found</h1>")
 
+
 @app.get("/students/", response_class=HTMLResponse)
 async def students_page():
     from routers.students import students_page as students_handler
+
     return await students_handler()
+
 
 @app.get("/courses/", response_class=HTMLResponse)
 async def courses_page():
     from routers.courses import courses_page as courses_handler
+
     return await courses_handler()
+
 
 @app.get("/enrollments/", response_class=HTMLResponse)
 async def enrollments_page():
     from routers.enrollments import enrollments_page as enrollments_handler
+
     return await enrollments_handler()
 
 
@@ -56,7 +62,7 @@ async def health_check():
         "status": "healthy",
         "message": "Student Management System работает корректно",
         "version": "2.0.0",
-        "database": "SQLite"
+        "database": "SQLite",
     }
 
 
