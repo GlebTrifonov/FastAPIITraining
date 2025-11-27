@@ -1,7 +1,3 @@
-https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi
-https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white
-https://img.shields.io/badge/SQLAlchemy-1.4.29-red?style=for-the-badge
-https://img.shields.io/badge/Pytest-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white
 
 Полнофункциональная система управления студентами и курсами с современным REST API, построенная на FastAPI и SQLAlchemy ORM.
 
