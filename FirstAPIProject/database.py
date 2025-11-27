@@ -1,9 +1,17 @@
 from sqlalchemy import create_engine, String, Integer, Boolean, Float, Text, ForeignKey
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, sessionmaker
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Mapped,
+    mapped_column,
+    relationship,
+    sessionmaker,
+)
 from typing import Optional, List
+
 
 class Base(DeclarativeBase):
     pass
+
 
 class Student(Base):
     __tablename__ = "student"
@@ -14,7 +22,10 @@ class Student(Base):
     email: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     is_active: Mapped[bool] = mapped_column(default=True)
 
-    enrollments: Mapped[List["Enrollment"]] = relationship("Enrollment", back_populates="student")
+    enrollments: Mapped[List["Enrollment"]] = relationship(
+        "Enrollment", back_populates="student"
+    )
+
 
 class Course(Base):
     __tablename__ = "course"
@@ -24,7 +35,10 @@ class Course(Base):
     duration_hours: Mapped[float]
     price: Mapped[float] = mapped_column(default=0.0)
 
-    enrollments: Mapped[List["Enrollment"]] = relationship("Enrollment", back_populates="course")
+    enrollments: Mapped[List["Enrollment"]] = relationship(
+        "Enrollment", back_populates="course"
+    )
+
 
 class Enrollment(Base):
     __tablename__ = "enrollment"
@@ -35,11 +49,14 @@ class Enrollment(Base):
     student: Mapped["Student"] = relationship("Student", back_populates="enrollments")
     course: Mapped["Course"] = relationship("Course", back_populates="enrollments")
 
+
 engine = create_engine("sqlite:///student_management.db", echo=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+
 def create_tables():
     Base.metadata.create_all(bind=engine)
+
 
 def get_db():
     db = SessionLocal()
@@ -47,5 +64,6 @@ def get_db():
         yield db
     finally:
         db.close()
+
 
 print("ORM models created successfully")

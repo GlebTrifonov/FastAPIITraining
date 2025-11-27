@@ -5,6 +5,7 @@ from sqlalchemy import select
 from database import Student, Course, Enrollment, get_db
 from models import StudentCreate, CourseCreate, EnrollmentCreate
 
+
 def create_student(db: Session, student: StudentCreate) -> Student:
     db_student = Student(
         first_name=student.first_name,
@@ -18,14 +19,19 @@ def create_student(db: Session, student: StudentCreate) -> Student:
     db.refresh(db_student)
     return db_student
 
+
 def get_student(db: Session, student_id: int) -> Student | None:
     return db.get(Student, student_id)
+
 
 def get_all_students(db: Session) -> list[Student]:
     result = db.execute(select(Student))
     return result.scalars().all()
 
-def update_student(db: Session, student_id: int, student_data:StudentCreate) -> Student:
+
+def update_student(
+    db: Session, student_id: int, student_data: StudentCreate
+) -> Student:
     db_student = db.get(db, student_id)
     db_student.first_name = student_data.first_name
     db_student.last_name = student_data.last_name
@@ -36,6 +42,7 @@ def update_student(db: Session, student_id: int, student_data:StudentCreate) -> 
     db.refresh(db_student)
     return db_student
 
+
 def delete_student(db: Session, student_id: int) -> bool:
     student = db.get(Student, student_id)
     if student:
@@ -44,7 +51,8 @@ def delete_student(db: Session, student_id: int) -> bool:
         return True
     return False
 
-def create_course(db:Session, course: CourseCreate) -> Course:
+
+def create_course(db: Session, course: CourseCreate) -> Course:
     db_course = Course(
         title=course.title,
         description=course.description,
@@ -56,12 +64,15 @@ def create_course(db:Session, course: CourseCreate) -> Course:
     db.refresh(db_course)
     return db_course
 
+
 def get_course(db: Session, course_id: int) -> Course | None:
     return db.get(Course, course_id)
+
 
 def get_all_courses(db: Session) -> list[Course]:
     result = db.execute(select(Course))
     return result.scalars().all()
+
 
 def update_course(db: Session, course_id: int, course_data: CourseCreate) -> Course:
     db_course = db.get(Course, course_id)
@@ -73,6 +84,7 @@ def update_course(db: Session, course_id: int, course_data: CourseCreate) -> Cou
     db.refresh(db_course)
     return db_course
 
+
 def delete_course(db: Session, course_id: int) -> bool:
     course = db.get(Course, course_id)
     if course:
@@ -80,6 +92,7 @@ def delete_course(db: Session, course_id: int) -> bool:
         db.commit()
         return True
     return False
+
 
 def create_enrollment(db: Session, enrollment: EnrollmentCreate) -> Enrollment:
     student = db.get(Student, enrollment.student_id)
@@ -92,8 +105,8 @@ def create_enrollment(db: Session, enrollment: EnrollmentCreate) -> Enrollment:
 
     existing = db.execute(
         select(Enrollment).where(
-            (Enrollment.student_id == enrollment.student_id) &
-            (Enrollment.course_id == enrollment.course_id)
+            (Enrollment.student_id == enrollment.student_id)
+            & (Enrollment.course_id == enrollment.course_id)
         )
     ).scalar_one_or_none()
 
@@ -109,26 +122,34 @@ def create_enrollment(db: Session, enrollment: EnrollmentCreate) -> Enrollment:
     db.refresh(db_enrollment)
     return db_enrollment
 
+
 def get_enrollment(db: Session, enrollment_id: int) -> Enrollment | None:
     return db.get(Enrollment, enrollment_id)
+
 
 def get_all_enrollments(db: Session) -> list[Enrollment]:
     result = db.execute(select(Enrollment))
     return result.scalars().all()
+
 
 def get_detailed_enrollments(db: Session) -> list[dict]:
     enrollments = get_all_enrollments(db)
     detailed = []
 
     for enrollment in enrollments:
-        detailed.append({
-            "enrollment": enrollment,
-            "student": enrollment.student,
-            "course": enrollment.course,
-        })
+        detailed.append(
+            {
+                "enrollment": enrollment,
+                "student": enrollment.student,
+                "course": enrollment.course,
+            }
+        )
     return detailed
 
-def update_enrollment(db: Session, enrollment_id: int, enrollment_data: EnrollmentCreate) -> Enrollment:
+
+def update_enrollment(
+    db: Session, enrollment_id: int, enrollment_data: EnrollmentCreate
+) -> Enrollment:
     db_enrollment = db.get(Enrollment, enrollment_id)
     db_enrollment.student_id = enrollment_data.student_id
     db_enrollment.course_id = enrollment_data.course_id
@@ -144,5 +165,6 @@ def delete_enrollment(db: Session, enrollment_id: int) -> bool:
         db.commit()
         return True
     return False
+
 
 print("ORM crud operations created successfully")
