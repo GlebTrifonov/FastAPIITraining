@@ -1,0 +1,23 @@
+# Создать миграцию (автоопределение изменений)
+alembic revision --autogenerate -m "Описание изменений"
+
+# Применить ВСЕ миграции
+alembic upgrade head
+
+# Применить до конкретной версии
+alembic upgrade 123abc456
+
+# Откатить на 1 миграцию
+alembic downgrade -1
+
+# Откатить до конкретной версии
+alembic downgrade 123abc456
+
+# Показать текущую версию
+alembic current
+
+# Показать историю миграций
+alembic history --verbose
+
+# Создать пустую миграцию (для ручного SQL)
+alembic revision -m "Ручные изменения"
